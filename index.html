@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PageVault — Free open community library. Read, download and share books. No registration. No sign up. No sign in. Ever.">
+  <title>PageVault — Free Open Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white:       #ffffff;
+      --off:         #fafaf8;
+      --paper:       #f5f4f0;
+      --rule:        #e2e0da;
+      --rule-dark:   #c8c5bc;
+      --ink:         #111110;
+      --ink-2:       #3a3935;
+      --ink-3:       #6b6960;
+      --ink-4:       #a09d96;
+      --green:       #1a3d2b;
+      --green-mid:   #2d5a40;
+      --green-pale:  #eef4f0;
+      --green-pale2: #d8ebe0;
+      --red:         #b83232;
+      --red-pale:    #fdf0f0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection { background: var(--green); color: var(--white); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--paper); }
+    ::-webkit-scrollbar-thumb { background: var(--ink); }
+
+    /* TICKER */
+    .ticker {
+      background: var(--ink);
+      color: var(--white);
+      height: 34px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .ticker-track {
+      display: flex;
+      animation: ticker 32s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-track span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0 38px;
+      opacity: 0.8;
+    }
+    .ticker-track span.sep { opacity: 0.25; padding: 0; }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* HEADER */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--rule);
+      height: 72px;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 600;
+    }
+
+    .logo { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+    .logo-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .logo-name em { color: var(--green); font-style: italic; }
+    .logo-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      color: var(--ink-4);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      border-left: 1px solid var(--rule-dark);
+      padding-left: 10px;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.64rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.14s ease;
+      white-space: nowrap;
+      background: none;
+    }
+    .btn-outline { border-color: var(--rule-dark); color: var(--ink-2); }
+    .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+    .btn-solid { background: var(--ink); color: var(--white); border-color: var(--ink); }
+    .btn-solid:hover { background: var(--green); border-color: var(--green); }
+    .btn-green { background: var(--green); color: var(--white); border-color: var(--green); }
+    .btn-green:hover { background: var(--green-mid); border-color: var(--green-mid); }
+
+    /* HERO */
+    .hero {
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .hero-left {
+      padding: 84px 48px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow-line { width: 30px; height: 1px; background: var(--green); display: inline-block; }
+
+    .hero-h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+    }
+    .hero-h1 em { font-style: italic; color: var(--green); }
+
+    .hero-p {
+      font-size: 0.92rem;
+      line-height: 1.85;
+      color: var(--ink-3);
+      max-width: 440px;
+      margin-bottom: 36px;
+      font-weight: 300;
+    }
+
+    .barrier-strip { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 38px; }
+    .barrier-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      border: 1px solid var(--rule);
+      color: var(--ink-3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bx { color: var(--red); font-size: 0.78rem; }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* Hero right */
+    .hero-right {
+      background: var(--off);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+    }
+
+    .lc {
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid var(--rule);
+      background: var(--white);
+    }
+    .lc-head {
+      background: var(--ink);
+      color: var(--white);
+      padding: 15px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .lc-head-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .lc-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.12em;
+      opacity: 0.5;
+      text-transform: uppercase;
+    }
+    .lc-dot {
+      width: 5px; height: 5px;
+      background: #5de88a;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+    .lc-row {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .lc-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    .lc-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .lc-val sup {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      font-weight: 400;
+      color: var(--ink-4);
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .lc-free {
+      background: var(--green-pale);
+      padding: 15px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--green-pale2);
+    }
+    .lc-free-lbl {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-mid);
+    }
+    .lc-free-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--green);
+      font-style: italic;
+    }
+    .lc-foot {
+      background: var(--paper);
+      padding: 11px 22px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.52rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      text-align: center;
+      border-top: 1px solid var(--rule);
+    }
+
+    /* CONTROLS */
+    .controls-strip {
+      background: var(--white);
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 72px;
+      z-index: 500;
+    }
+    .controls-inner {
+      padding: 13px 48px;
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-wrap { flex: 1; min-width: 240px; position: relative; }
+    .search-wrap svg {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-4);
+      pointer-events: none;
+    }
+    #searchInput {
+      width: 100%;
+      background: var(--off);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.73rem;
+      letter-spacing: 0.03em;
+      padding: 10px 13px 10px 37px;
+      outline: none;
+      transition: border-color 0.14s, background 0.14s;
+    }
+    #searchInput::placeholder { color: var(--ink-4); }
+    #searchInput:focus { border-color: var(--ink); background: var(--white); }
+
+    .vr { width: 1px; height: 26px; background: var(--rule); flex-shrink: 0; }
+
+    .filters { display: flex; gap: 4px; flex-wrap: wrap; }
+    .f-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .f-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .f-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+
+    .sort-group { display: flex; align-items: center; gap: 7px; }
+    .sort-lbl {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+    }
+    #sortSelect {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      padding: 7px 26px 7px 10px;
+      background: var(--off);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+      outline: none;
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%23111110' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    .result-count {
+      margin-left: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.07em;
+      color: var(--ink-4);
+    }
+    .result-count strong { color: var(--ink); }
+
+    /* MAIN */
+    .main {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 56px 48px 100px;
+    }
+
+    .sec-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+    .sec-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+    /* BOOK GRID */
+    #bookGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-bottom: 80px;
+    }
+
+    .book-card {
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      transition: background 0.14s;
+      animation: fadeUp 0.3s ease both;
+    }
+    .book-card:hover { background: var(--off); }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .card-bar { height: 2px; width: 100%; flex-shrink: 0; }
+    .card-inner { padding: 24px 26px 22px; flex: 1; display: flex; flex-direction: column; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 13px; }
+
+    .genre-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.53rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--green);
+      border: 1px solid var(--green-pale2);
+      background: var(--green-pale);
+      padding: 4px 9px;
+    }
+    .fmt-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-4);
+      border: 1px solid var(--rule);
+      padding: 3px 7px;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.18rem;
+      font-weight: 700;
+      line-height: 1.22;
+      color: var(--ink);
+      margin-bottom: 5px;
+      letter-spacing: -0.01em;
+    }
+    .card-author {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--ink-4);
+      letter-spacing: 0.06em;
+      margin-bottom: 13px;
+    }
+    .card-desc {
+      font-size: 0.78rem;
+      line-height: 1.75;
+      color: var(--ink-3);
+      flex: 1;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      margin-bottom: 16px;
+      font-weight: 300;
+    }
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-top: 13px;
+      border-top: 1px solid var(--rule);
+      margin-bottom: 15px;
+    }
+    .meta-pair { display: flex; flex-direction: column; gap: 3px; }
+    .meta-k { font-family: 'DM Mono', monospace; font-size: 0.48rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-4); }
+    .meta-v { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-2); }
+
+    .card-actions { display: flex; gap: 6px; }
+    .c-btn {
+      flex: 1;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 10px 8px;
+      border: 1px solid;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.12s;
+    }
+    .c-dl { background: var(--ink); border-color: var(--ink); color: var(--white); }
+    .c-dl:hover { background: var(--green); border-color: var(--green); }
+    .c-rd { background: transparent; border-color: var(--rule-dark); color: var(--ink-3); }
+    .c-rd:hover { border-color: var(--ink); color: var(--ink); }
+
+    .state-box { grid-column: 1/-1; background: var(--white); padding: 100px 40px; text-align: center; }
+    .state-icon { font-size: 2.4rem; margin-bottom: 14px; opacity: 0.25; }
+    .state-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ink); margin-bottom: 8px; }
+    .state-sub { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--ink-4); letter-spacing: 0.05em; }
+    .state-sub a { color: var(--green); text-decoration: none; cursor: pointer; }
+
+    .loading-dots { display: inline-flex; gap: 6px; margin-bottom: 14px; }
+    .loading-dots span { width: 7px; height: 7px; background: var(--ink); border-radius: 50%; animation: db 1.1s ease infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.18s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes db { 0%,80%,100%{transform:scale(0.35);opacity:0.15} 40%{transform:scale(1);opacity:1} }
+
+    /* HOW */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      margin-bottom: 80px;
+    }
+    .how-card { background: var(--white); padding: 40px 32px; transition: background 0.14s; }
+    .how-card:hover { background: var(--off); }
+    .how-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--rule);
+      line-height: 1;
+      margin-bottom: 18px;
+      letter-spacing: -0.04em;
+    }
+    .how-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+    .how-text { font-size: 0.8rem; line-height: 1.8; color: var(--ink-3); font-weight: 300; }
+
+    /* UPLOAD */
+    .upload-wrap { border: 1px solid var(--rule); margin-bottom: 80px; overflow: hidden; }
+
+    .upload-banner {
+      background: var(--ink);
+      color: var(--white);
+      padding: 48px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 40px;
+      align-items: center;
+    }
+    .upload-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 2.5vw, 2.3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .upload-banner h2 em { font-style: italic; color: #a0d4b4; }
+    .upload-banner p { font-size: 0.8rem; line-height: 1.85; opacity: 0.5; max-width: 500px; font-weight: 300; }
+
+    .upload-badges { display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+    .upload-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 7px 13px;
+      border: 1px solid rgba(255,255,255,0.13);
+      color: rgba(255,255,255,0.55);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .upload-badge .x { color: #e88080; }
+
+    .upload-form-area { background: var(--white); padding: 44px 48px; border-top: 1px solid var(--rule); }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .fg { display: flex; flex-direction: column; gap: 7px; }
+    .fg.span2 { grid-column: 1/-1; }
+    .fg label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .fg label .req { color: var(--red); }
+    .fg input, .fg select, .fg textarea {
+      background: var(--off);
+      border: 1px solid var(--rule);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.76rem;
+      letter-spacing: 0.03em;
+      padding: 11px 13px;
+      outline: none;
+      transition: border-color 0.14s, background 0.14s;
+      width: 100%;
+    }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--ink); background: var(--white); }
+    .fg input::placeholder { color: var(--ink-4); }
+    .fg select {
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%23111110' stroke-width='1.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 11px center; padding-right: 28px;
+    }
+    .fg textarea { resize: vertical; min-height: 88px; line-height: 1.65; }
+
+    .drop-zone {
+      border: 1px dashed var(--rule-dark);
+      padding: 44px 24px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--off);
+      transition: all 0.14s;
+      position: relative;
+      overflow: hidden;
+    }
+    .drop-zone:hover, .drop-zone.active { border-color: var(--ink); background: var(--white); }
+    .drop-zone.has-file { border-color: var(--green); border-style: solid; background: var(--green-pale); }
+    .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .dz-icon { font-size: 2rem; margin-bottom: 9px; display: block; }
+    .dz-main { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--ink-3); letter-spacing: 0.05em; margin-bottom: 4px; }
+    .dz-main strong { color: var(--ink); }
+    .dz-sub { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.08em; color: var(--ink-4); }
+    .dz-file { margin-top: 9px; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--green); font-weight: 500; }
+
+    .progress-wrap { margin-top: 13px; display: none; }
+    .progress-wrap.show { display: block; }
+    .progress-track { background: var(--rule); height: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--ink); width: 0%; transition: width 0.3s ease; }
+    .progress-lbl { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.08em; color: var(--ink-4); margin-top: 6px; text-transform: uppercase; }
+
+    .form-foot { display: flex; gap: 10px; align-items: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--rule); }
+    .form-disclaimer { font-size: 0.72rem; line-height: 1.75; color: var(--ink-4); flex: 1; font-weight: 300; }
+    .form-foot .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* LEGAL */
+    .legal {
+      background: var(--red-pale);
+      border: 1px solid #eecfcf;
+      padding: 20px 26px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 80px;
+    }
+    .legal-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .legal-body h4 { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 5px; }
+    .legal-body p { font-size: 0.74rem; line-height: 1.75; color: var(--ink-3); font-weight: 300; }
+    .legal-body a { color: var(--green); text-decoration: none; }
+    .legal-body a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer { background: var(--ink); color: var(--white); }
+    .footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 64px 48px 44px;
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 52px;
+    }
+    .ft-brand { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--white); letter-spacing: -0.02em; margin-bottom: 12px; display: block; }
+    .ft-brand em { color: #a0d4b4; font-style: italic; }
+    .ft-desc { font-size: 0.77rem; line-height: 1.85; color: rgba(255,255,255,0.36); margin-bottom: 22px; font-weight: 300; }
+    .ft-pills { display: flex; flex-direction: column; gap: 6px; }
+    .ft-pill {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.56rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 11px;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      width: fit-content;
+    }
+    .ft-pill .x { color: #e88080; }
+    .ft-col h5 { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 18px; }
+    .ft-col ul { list-style: none; }
+    .ft-col li { margin-bottom: 10px; }
+    .ft-col a { font-size: 0.77rem; color: rgba(255,255,255,0.42); text-decoration: none; transition: color 0.13s; font-weight: 300; }
+    .ft-col a:hover { color: #a0d4b4; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); padding: 18px 48px; max-width: 1320px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .ft-copy { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.2); text-transform: uppercase; }
+    .ft-links { display: flex; gap: 22px; }
+    .ft-links a { font-family: 'DM Mono', monospace; font-size: 0.53rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.26); text-decoration: none; text-transform: uppercase; }
+    .ft-links a:hover { color: #a0d4b4; }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9000; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .toast { background: var(--white); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 14px 18px; max-width: 360px; min-width: 250px; box-shadow: 0 4px 20px rgba(17,17,16,0.1); animation: tIn 0.22s ease; }
+    .toast.error { border-left-color: var(--red); }
+    .toast.success { border-left-color: var(--green); }
+    @keyframes tIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+    .toast-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+    .toast-title { font-family: 'DM Mono', monospace; font-size: 0.63rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+    .toast.success .toast-title { color: var(--green); }
+    .toast.error .toast-title { color: var(--red); }
+    .toast-close { background: none; border: none; cursor: pointer; color: var(--ink-4); font-size: 1rem; line-height: 1; padding: 0; }
+    .toast-msg { font-size: 0.73rem; line-height: 1.65; color: var(--ink-3); font-weight: 300; }
+
+    /* RESPONSIVE */
+    @media (max-width: 1000px) {
+      header { padding: 0 24px; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-left { padding: 56px 24px; border-right: none; border-bottom: 1px solid var(--rule); }
+      .hero-right { padding: 40px 24px; }
+      .controls-inner { padding: 12px 24px; }
+      .main { padding: 40px 24px 80px; }
+      .how-grid { grid-template-columns: 1fr; }
+      .upload-banner { grid-template-columns: 1fr; gap: 28px; padding: 36px 28px; }
+      .upload-form-area { padding: 32px 28px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .fg.span2 { grid-column: 1; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 36px; padding: 44px 24px 32px; }
+      .footer-bottom { flex-direction: column; gap: 12px; padding: 18px 24px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .hero-h1 { font-size: 2.8rem; }
+      .footer-inner { grid-template-columns: 1fr; }
+      #bookGrid { grid-template-columns: 1fr; }
+      .logo-tag { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker" role="banner" aria-label="Key messages">
+  <div class="ticker-track" aria-hidden="true">
+    <span>No Registration</span><span class="sep"> · </span>
+    <span>No Sign Up</span><span class="sep"> · </span>
+    <span>No Sign In</span><span class="sep"> · </span>
+    <span>100% Free</span><span class="sep"> · </span>
+    <span>Open Community Library</span><span class="sep"> · </span>
+    <span>Upload Instantly</span><span class="sep"> · </span>
+    <span>Download Freely</span><span class="sep"> · </span>
+    <span>Read Anywhere</span><span class="sep"> · </span>
+    <span>No Registration</span><span class="sep"> · </span>
+    <span>No Sign Up</span><span class="sep"> · </span>
+    <span>No Sign In</span><span class="sep"> · </span>
+    <span>100% Free</span><span class="sep"> · </span>
+    <span>Open Community Library</span><span class="sep"> · </span>
+    <span>Upload Instantly</span><span class="sep"> · </span>
+    <span>Download Freely</span><span class="sep"> · </span>
+    <span>Read Anywhere</span><span class="sep"> · </span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#" aria-label="PageVault Home">
+    <span class="logo-name">Page<em>Vault</em></span>
+    <span class="logo-tag">Open Library</span>
+  </a>
+  <div class="header-right">
+    <a class="btn btn-outline" href="https://github.com/YOUR_GITHUB_USERNAME/Pages" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38v-1.49c-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.65 7.65 0 018 4.07c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+    <button class="btn btn-solid" onclick="scrollToUpload()">+ Upload</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero section">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="eyebrow-line"></span>
+      Community Open Library · Powered by GitHub
+    </div>
+    <h1 class="hero-h1">Read freely.<br>Share openly.<br><em>No barriers.</em></h1>
+    <p class="hero-p">PageVault is a free, open community library. Upload any book in seconds — it appears live for everyone instantly. No account, no approval, no friction.</p>
+    <div class="barrier-strip">
+      <div class="barrier-pill"><span class="bx">✕</span> No Registration</div>
+      <div class="barrier-pill"><span class="bx">✕</span> No Sign Up</div>
+      <div class="barrier-pill"><span class="bx">✕</span> No Sign In</div>
+      <div class="barrier-pill"><span class="bx">✕</span> No Fees. Ever.</div>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn-solid" href="#library" style="font-size:0.68rem;padding:13px 26px;">Browse Library ↓</a>
+      <button class="btn btn-outline" onclick="scrollToUpload()" style="font-size:0.68rem;padding:13px 24px;">+ Share a Book</button>
+    </div>
+  </div>
+
+  <div class="hero-right" aria-label="Library statistics">
+    <div class="lc">
+      <div class="lc-head">
+        <div class="lc-head-title">Library at a Glance</div>
+        <div class="lc-live"><div class="lc-dot"></div>Live</div>
+      </div>
+      <div class="lc-row">
+        <div class="lc-label">Books Available</div>
+        <div class="lc-val" id="statBooks">—<sup>titles</sup></div>
+      </div>
+      <div class="lc-row">
+        <div class="lc-label">Genres Covered</div>
+        <div class="lc-val" id="statGenres">—<sup>genres</sup></div>
+      </div>
+      <div class="lc-row" style="border-bottom:none">
+        <div class="lc-label">Formats</div>
+        <div class="lc-val" style="font-size:1.4rem">2<sup>PDF + EPUB</sup></div>
+      </div>
+      <div class="lc-free">
+        <div class="lc-free-lbl">Cost to Read</div>
+        <div class="lc-free-val">Always Free</div>
+      </div>
+      <div class="lc-foot">No account · Open source · Hosted on GitHub</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTROLS -->
+<div class="controls-strip" role="search" aria-label="Search and filter books">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="searchInput" placeholder="Search title, author, genre…" autocomplete="off" aria-label="Search books">
+    </div>
+    <div class="vr" aria-hidden="true"></div>
+    <div class="filters" id="filterGroup" role="group" aria-label="Filter by genre"></div>
+    <div class="vr" aria-hidden="true"></div>
+    <div class="sort-group">
+      <span class="sort-lbl" id="sort-lbl">Sort</span>
+      <select id="sortSelect" aria-labelledby="sort-lbl">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="title">A → Z Title</option>
+        <option value="author">A → Z Author</option>
+      </select>
+    </div>
+    <div class="result-count" id="resultCount" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- LIBRARY -->
+  <div id="library">
+    <div class="sec-label">The Collection</div>
+    <div id="bookGrid" role="list" aria-label="Book collection">
+      <div class="state-box">
+        <div class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="state-title">Loading the library…</div>
+        <div class="state-sub">Fetching books from GitHub</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="sec-label">How It Works</div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num" aria-hidden="true">01</div>
+      <div class="how-title">Browse & Search</div>
+      <p class="how-text">Search by title, author, genre, or language. Filter by category. Sort any way you like. No account needed — the entire library is completely open to everyone.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num" aria-hidden="true">02</div>
+      <div class="how-title">Upload Instantly</div>
+      <p class="how-text">Have a book to share? Fill in the form, drop your PDF or EPUB, and hit Upload. Your book is automatically committed to GitHub and appears live in seconds.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num" aria-hidden="true">03</div>
+      <div class="how-title">Download & Read</div>
+      <p class="how-text">Click Download to save any book to your device, or Read to open it directly in your browser. Instant access every time — no account, no fees, no strings attached.</p>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="upload-section">
+    <div class="sec-label">Share a Book with the World</div>
+    <div class="upload-wrap">
+      <div class="upload-banner">
+        <div>
+          <h2>Your upload goes <em>live automatically.</em></h2>
+          <p>No GitHub account needed. No pull requests. No approval queues. Fill in the details, drop your file, and hit Upload — our server handles everything automatically.</p>
+        </div>
+        <div class="upload-badges">
+          <div class="upload-badge"><span class="x">✕</span> No GitHub account needed</div>
+          <div class="upload-badge"><span class="x">✕</span> No approval queue</div>
+          <div class="upload-badge" id="serverStatus">⟳ Checking server…</div>
+        </div>
+      </div>
+
+      <div class="upload-form-area">
+        <form id="uploadForm" novalidate aria-label="Book upload form">
+          <div class="form-grid">
+
+            <div class="fg span2">
+              <label for="uf-title">Book Title <span class="req">*</span></label>
+              <input type="text" id="uf-title" name="title" placeholder="e.g. Pride and Prejudice" required maxlength="200">
+            </div>
+
+            <div class="fg">
+              <label for="uf-author">Author <span class="req">*</span></label>
+              <input type="text" id="uf-author" name="author" placeholder="e.g. Jane Austen" required maxlength="150">
+            </div>
+
+            <div class="fg">
+              <label for="uf-year">Year Published</label>
+              <input type="number" id="uf-year" name="year" placeholder="e.g. 1813" min="-3000" max="2025">
+            </div>
+
+            <div class="fg">
+              <label for="uf-genre">Genre <span class="req">*</span></label>
+              <select id="uf-genre" name="genre" required>
+                <option value="">Select a genre…</option>
+                <option>Fiction</option>
+                <option>Non-Fiction</option>
+                <option>Science</option>
+                <option>History</option>
+                <option>Philosophy</option>
+                <option>Biography</option>
+                <option>Poetry</option>
+                <option>Children</option>
+                <option>Technology</option>
+                <option>Religion &amp; Spirituality</option>
+                <option>Politics &amp; Society</option>
+                <option>Art &amp; Culture</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label for="uf-lang">Language</label>
+              <input type="text" id="uf-lang" name="language" value="English" placeholder="English" maxlength="50">
+            </div>
+
+            <div class="fg span2">
+              <label for="uf-desc">Description</label>
+              <textarea id="uf-desc" name="description" placeholder="A brief description — what is this book about?" maxlength="800"></textarea>
+            </div>
+
+            <div class="fg span2">
+              <label>Book File (PDF or EPUB) <span class="req">*</span></label>
+              <div class="drop-zone" id="dropZone" role="button" tabindex="0" aria-label="Click or drag to upload a book file">
+                <input type="file" id="bookFileInput" name="bookFile" accept=".pdf,.epub" aria-label="Select book file">
+                <span class="dz-icon" id="dropIcon" aria-hidden="true">📄</span>
+                <div class="dz-main"><strong>Click to select</strong> or drag & drop here</div>
+                <div class="dz-sub">PDF or EPUB · Maximum 50 MB</div>
+                <div class="dz-file" id="dropFileName" aria-live="polite"></div>
+              </div>
+              <div class="progress-wrap" id="uploadProgress">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="progress-lbl" id="progressLabel">Uploading…</div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="form-foot">
+            <button type="submit" class="btn btn-green" id="uploadBtn" style="font-size:0.68rem;padding:13px 26px;">⚡ Upload to Library</button>
+            <button type="button" class="btn btn-outline" onclick="resetForm()" style="font-size:0.68rem;padding:13px 20px;">Clear</button>
+            <p class="form-disclaimer">By uploading, you confirm this book is in the public domain, Creative Commons licensed, or you hold the rights to share it. Copyrighted material will be removed.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGAL -->
+  <div class="legal" role="note">
+    <div class="legal-icon" aria-hidden="true">⚖️</div>
+    <div class="legal-body">
+      <h4>Copyright & Legal Notice</h4>
+      <p>PageVault only hosts books legally free to distribute — public domain works (pre-1928 in the US), Creative Commons or open-licensed titles, or books shared with explicit author permission.
+        Great sources: <a href="https://www.gutenberg.org" target="_blank" rel="noopener">Project Gutenberg</a> (70,000+ free titles),
+        <a href="https://standardebooks.org" target="_blank" rel="noopener">Standard Ebooks</a>,
+        <a href="https://openlibrary.org" target="_blank" rel="noopener">Open Library</a>, and
+        <a href="https://archive.org/details/texts" target="_blank" rel="noopener">Internet Archive</a>.
+        Copyrighted uploads will be removed.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <span class="ft-brand">Page<em>Vault</em></span>
+      <p class="ft-desc">A free, open community library powered by GitHub Pages. Built by readers, for readers. Everything is automated — upload a book and it goes live instantly.</p>
+      <div class="ft-pills">
+        <div class="ft-pill"><span class="x">✕</span> No Registration</div>
+        <div class="ft-pill"><span class="x">✕</span> No Sign Up · No Sign In</div>
+        <div class="ft-pill"><span class="x">✕</span> No Fees. Ever.</div>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h5>Library</h5>
+      <ul>
+        <li><a href="#library">Browse All Books</a></li>
+        <li><a href="#" onclick="setGenre('Fiction')">Fiction</a></li>
+        <li><a href="#" onclick="setGenre('Science')">Science</a></li>
+        <li><a href="#" onclick="setGenre('Philosophy')">Philosophy</a></li>
+        <li><a href="#" onclick="setGenre('History')">History</a></li>
+        <li><a href="#" onclick="setGenre('Biography')">Biography</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h5>Contribute</h5>
+      <ul>
+        <li><a href="#" onclick="scrollToUpload()">Upload a Book</a></li>
+        <li><a href="https://github.com/YOUR_GITHUB_USERNAME/Pages" target="_blank" rel="noopener">View on GitHub</a></li>
+        <li><a href="https://github.com/YOUR_GITHUB_USERNAME/Pages/issues" target="_blank" rel="noopener">Report an Issue</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h5>Free Book Sources</h5>
+      <ul>
+        <li><a href="https://www.gutenberg.org" target="_blank" rel="noopener">Project Gutenberg</a></li>
+        <li><a href="https://standardebooks.org" target="_blank" rel="noopener">Standard Ebooks</a></li>
+        <li><a href="https://openlibrary.org" target="_blank" rel="noopener">Open Library</a></li>
+        <li><a href="https://archive.org/details/texts" target="_blank" rel="noopener">Internet Archive</a></li>
+        <li><a href="https://manybooks.net" target="_blank" rel="noopener">ManyBooks</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="ft-copy">© 2025 PageVault — Open Community Library · GitHub Pages · MIT License</div>
+    <div class="ft-links">
+      <a href="https://github.com/YOUR_GITHUB_USERNAME/Pages" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/YOUR_GITHUB_USERNAME/Pages/blob/main/README.md" target="_blank" rel="noopener">Docs</a>
+      <a href="https://creativecommons.org" target="_blank" rel="noopener">Creative Commons</a>
+    </div>
+  </div>
+</footer>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+'use strict';
+
+/* ─── CONFIGURATION ─────────────────────────────────────────────
+   Only replace these 2 values — everything else is automatic
+──────────────────────────────────────────────────────────────── */
+const CONFIG = {
+  BACKEND_URL:   'https://YOUR_RENDER_NAME.onrender.com',
+  GITHUB_OWNER:  'YOUR_GITHUB_USERNAME',
+  GITHUB_REPO:   'Pages',
+  GITHUB_BRANCH: 'main'
+};
+
+/* ─── GENRE COLORS ───────────────────────────────────────────── */
+const GENRE_COLORS = {
+  'Fiction':               '#9c3d2e',
+  'Non-Fiction':           '#556b55',
+  'Science':               '#3a4a5a',
+  'History':               '#7a5a2a',
+  'Philosophy':            '#4a5a7a',
+  'Biography':             '#5a4570',
+  'Poetry':                '#7a4a2a',
+  'Children':              '#3a6b60',
+  'Technology':            '#2a5a6a',
+  'Religion & Spirituality': '#6a5535',
+  'Politics & Society':    '#5a3a5a',
+  'Art & Culture':         '#6a3a4a',
+  'Other':                 '#4a4a4a'
+};
+
+/* ─── STATE ──────────────────────────────────────────────────── */
+let books       = [];
+let activeGenre = 'all';
+let searchQuery = '';
+let sortMode    = 'newest';
+
+/* ─── LOAD BOOKS ─────────────────────────────────────────────── */
+async function loadBooks() {
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/api/books`, { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    books = data.books || [];
+    renderAll();
+  } catch (err) {
+    console.warn('Backend unavailable, falling back to books.json:', err.message);
+    try {
+      const res2 = await fetch('books.json?_=' + Date.now());
+      if (res2.ok) books = await res2.json();
+    } catch {}
+    renderAll();
+  }
+}
+
+/* ─── SERVER STATUS ──────────────────────────────────────────── */
+async function checkServerStatus() {
+  const el = document.getElementById('serverStatus');
+  try {
+    const res = await fetch(`${CONFIG.BACKEND_URL}/health`, { signal: AbortSignal.timeout(5000) });
+    if (res.ok) {
+      el.innerHTML = '<span style="color:#a0d4b4">✓ Server Online · Ready to Upload</span>';
+    } else throw new Error();
+  } catch {
+    el.innerHTML = '<span style="opacity:0.45">⚠ Server offline — see setup guide</span>';
+  }
+}
+
+/* ─── FILTER + SORT ──────────────────────────────────────────── */
+function getGenres() {
+  return [...new Set(books.map(b => b.genre).filter(Boolean))].sort();
+}
+
+function filtered() {
+  let list = [...books];
+  if (activeGenre !== 'all') list = list.filter(b => b.genre === activeGenre);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    list = list.filter(b =>
+      (b.title       || '').toLowerCase().includes(q) ||
+      (b.author      || '').toLowerCase().includes(q) ||
+      (b.genre       || '').toLowerCase().includes(q) ||
+      (b.description || '').toLowerCase().includes(q) ||
+      (b.language    || '').toLowerCase().includes(q)
+    );
+  }
+  if      (sortMode === 'newest') list.sort((a, b) => (b.year || 0) - (a.year || 0));
+  else if (sortMode === 'oldest') list.sort((a, b) => (a.year || 0) - (b.year || 0));
+  else if (sortMode === 'title')  list.sort((a, b) => (a.title  || '').localeCompare(b.title  || ''));
+  else if (sortMode === 'author') list.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
+  return list;
+}
+
+/* ─── RENDER ─────────────────────────────────────────────────── */
+function renderFilters() {
+  const group = document.getElementById('filterGroup');
+  const genres = getGenres();
+  group.innerHTML =
+    `<button class="f-btn ${activeGenre === 'all' ? 'active' : ''}" data-genre="all">All</button>` +
+    genres.map(g =>
+      `<button class="f-btn ${activeGenre === g ? 'active' : ''}" data-genre="${encodeURIComponent(g)}">${g}</button>`
+    ).join('');
+  group.querySelectorAll('.f-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeGenre = btn.dataset.genre === 'all' ? 'all' : decodeURIComponent(btn.dataset.genre);
+      renderAll();
+      document.getElementById('library').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+function renderBooks() {
+  const grid = document.getElementById('bookGrid');
+  const list = filtered();
+
+  document.getElementById('resultCount').innerHTML =
+    `Showing <strong>${list.length}</strong> of ${books.length}`;
+
+  if (!books.length) {
+    grid.innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">📭</div>
+        <div class="state-title">Library is empty</div>
+        <div class="state-sub">Be the first to <a onclick="scrollToUpload()">upload a book</a></div>
+      </div>`;
+    return;
+  }
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">🔍</div>
+        <div class="state-title">No results found</div>
+        <div class="state-sub"><a onclick="clearSearch()">Clear filters</a> to see all books</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map((book, i) => {
+    const color   = book.color || GENRE_COLORS[book.genre] || '#4a4a4a';
+    const year    = book.year ? (book.year < 0 ? `${Math.abs(book.year)} BC` : book.year) : '—';
+    const fileUrl = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.GITHUB_BRANCH}/${book.file}`;
+    return `
+      <div class="book-card" style="animation-delay:${Math.min(i * 0.04, 0.4)}s" role="listitem">
+        <div class="card-bar" style="background:${color}"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <span class="genre-tag">${escHtml(book.genre || '')}</span>
+            <span class="fmt-tag">${escHtml(book.format || 'PDF')}</span>
+          </div>
+          <div class="card-title">${escHtml(book.title || '')}</div>
+          <div class="card-author">${escHtml(book.author || '')}</div>
+          <div class="card-desc">${escHtml(book.description || '')}</div>
+          <div class="card-meta">
+            <div class="meta-pair"><span class="meta-k">Year</span><span class="meta-v">${year}</span></div>
+            <div class="meta-pair"><span class="meta-k">Size</span><span class="meta-v">${escHtml(book.size || '—')}</span></div>
+            <div class="meta-pair"><span class="meta-k">Lang</span><span class="meta-v">${escHtml(book.language || 'English')}</span></div>
+          </div>
+          <div class="card-actions">
+            <a class="c-btn c-dl" href="${fileUrl}" download="${escHtml(book.title || 'book')}" aria-label="Download ${escHtml(book.title || '')}">↓ Download</a>
+            <a class="c-btn c-rd" href="${fileUrl}" target="_blank" rel="noopener" aria-label="Read ${escHtml(book.title || '')} online">↗ Read</a>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  document.getElementById('statBooks').innerHTML  = `${books.length}<sup>titles</sup>`;
+  document.getElementById('statGenres').innerHTML = `${getGenres().length}<sup>genres</sup>`;
+}
+
+function renderAll() { renderFilters(); renderBooks(); updateStats(); }
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  searchQuery = '';
+  activeGenre = 'all';
+  renderAll();
+}
+
+function setGenre(g) {
+  activeGenre = g;
+  renderAll();
+  setTimeout(() => document.getElementById('library').scrollIntoView({ behavior: 'smooth' }), 50);
+}
+
+/* ─── EVENTS ─────────────────────────────────────────────────── */
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  renderBooks();
+});
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+  sortMode = e.target.value;
+  renderBooks();
+});
+
+function scrollToUpload() {
+  document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ─── DROP ZONE ──────────────────────────────────────────────── */
+const dropZone    = document.getElementById('dropZone');
+const fileInput   = document.getElementById('bookFileInput');
+const dropIcon    = document.getElementById('dropIcon');
+const dropFileName = document.getElementById('dropFileName');
+
+function setFile(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf', 'epub'].includes(ext)) {
+    showToast('Invalid File', 'Only PDF and EPUB files are accepted.', 'error');
+    return;
+  }
+  if (file.size > 50 * 1024 * 1024) {
+    showToast('File Too Large', 'Maximum file size is 50 MB.', 'error');
+    return;
+  }
+  dropIcon.textContent = ext === 'epub' ? '📘' : '📄';
+  dropFileName.textContent = `✓ ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+  dropZone.classList.add('has-file');
+}
+
+fileInput.addEventListener('change', () => setFile(fileInput.files[0]));
+dropZone.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+});
+['dragover','dragenter'].forEach(evt =>
+  dropZone.addEventListener(evt, e => { e.preventDefault(); dropZone.classList.add('active'); })
+);
+['dragleave','dragend'].forEach(evt =>
+  dropZone.addEventListener(evt, () => dropZone.classList.remove('active'))
+);
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('active');
+  const f = e.dataTransfer.files[0];
+  if (f) { const dt = new DataTransfer(); dt.items.add(f); fileInput.files = dt.files; setFile(f); }
+});
+
+/* ─── UPLOAD FORM ────────────────────────────────────────────── */
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const title  = document.getElementById('uf-title').value.trim();
+  const author = document.getElementById('uf-author').value.trim();
+  const genre  = document.getElementById('uf-genre').value;
+  const year   = document.getElementById('uf-year').value.trim();
+  const lang   = document.getElementById('uf-lang').value.trim() || 'English';
+  const desc   = document.getElementById('uf-desc').value.trim();
+  const file   = fileInput.files[0];
+
+  if (!title)  return showToast('Missing Field', 'Please enter the book title.', 'error');
+  if (!author) return showToast('Missing Field', 'Please enter the author name.', 'error');
+  if (!genre)  return showToast('Missing Field', 'Please select a genre.', 'error');
+  if (!file)   return showToast('No File', 'Please select a PDF or EPUB file.', 'error');
+
+  const btn      = document.getElementById('uploadBtn');
+  const progress = document.getElementById('uploadProgress');
+  const fill     = document.getElementById('progressFill');
+  const label    = document.getElementById('progressLabel');
+
+  btn.disabled  = true;
+  btn.innerHTML = '⟳ Uploading…';
+  progress.classList.add('show');
+
+  let pct = 0;
+  const ticker = setInterval(() => {
+    pct = Math.min(pct + (pct < 60 ? 3 : pct < 85 ? 1 : 0.3), 90);
+    fill.style.width = pct + '%';
+    if (pct < 40)      label.textContent = 'Uploading file…';
+    else if (pct < 70) label.textContent = 'Committing to GitHub…';
+    else               label.textContent = 'Updating library catalog…';
+  }, 200);
+
+  try {
+    const formData = new FormData();
+    formData.append('title',       title);
+    formData.append('author',      author);
+    formData.append('genre',       genre);
+    formData.append('year',        year);
+    formData.append('language',    lang);
+    formData.append('description', desc);
+    formData.append('bookFile',    file);
+
+    const res  = await fetch(`${CONFIG.BACKEND_URL}/api/upload`, { method: 'POST', body: formData });
+    const data = await res.json();
+
+    clearInterval(ticker);
+    fill.style.width = '100%';
+    label.textContent = 'Complete!';
+
+    if (!res.ok || !data.success) throw new Error(data.error || 'Upload failed');
+
+    showToast('Book Added!', `"${title}" is now live in the library.`, 'success');
+    resetForm();
+    setTimeout(loadBooks, 2500);
+
+  } catch (err) {
+    clearInterval(ticker);
+    fill.style.width = '0%';
+    fill.style.background = '#b83232';
+    label.textContent = 'Upload failed';
+    const msg = err.message && err.message !== 'Failed to fetch'
+      ? err.message
+      : 'Could not connect to the backend server. Check your setup.';
+    showToast('Upload Failed', msg, 'error');
+  } finally {
+    btn.disabled  = false;
+    btn.innerHTML = '⚡ Upload to Library';
+    setTimeout(() => { progress.classList.remove('show'); fill.style.background = ''; }, 3000);
+  }
+});
+
+function resetForm() {
+  document.getElementById('uploadForm').reset();
+  dropFileName.textContent = '';
+  dropIcon.textContent = '📄';
+  dropZone.classList.remove('has-file', 'active');
+}
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+function showToast(title, message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const id = 'toast-' + Date.now();
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.id = id;
+  el.setAttribute('role', 'alert');
+  el.innerHTML = `
+    <div class="toast-head">
+      <div class="toast-title">${escHtml(title)}</div>
+      <button class="toast-close" onclick="document.getElementById('${id}').remove()" aria-label="Dismiss">×</button>
+    </div>
+    <div class="toast-msg">${escHtml(message)}</div>`;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+
+/* ─── SECURITY ───────────────────────────────────────────────── */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+/* ─── KEYBOARD SHORTCUT: Ctrl/Cmd+K → search ────────────────── */
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+});
+
+/* ─── INIT ───────────────────────────────────────────────────── */
+loadBooks();
+checkServerStatus();
+</script>
+
+</body>
+</html>
